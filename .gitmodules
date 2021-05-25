@@ -1,0 +1,6 @@
+[submodule "backend/data-service"]
+	path = backend/data-service
+	url = https://github.com/Somaliland-Electrification-Platform/global-electrification-platform-data-service.git
+[submodule "frontend/explorer"]
+	path = frontend/explorer
+	url = https://github.com/Somaliland-Electrification-Platform/global-electrification-platform-explorer.git
