@@ -7,6 +7,7 @@ docker-osm-settings/timestamp.txt
 
 *__pycache__/
 *logs/
+deployment/.env
 deployment/static/
 deployment/media/
 deployment/volumes/
