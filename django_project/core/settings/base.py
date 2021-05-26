@@ -85,6 +85,7 @@ _DEFAULT_LANGUAGES = (
     ('fr', 'Français'),
 )
 LANGUAGES = os.getenv('LANGUAGES', _DEFAULT_LANGUAGES)
+LANGUAGE_CODE = os.getenv('LANGUAGE_CODE', 'en')
 
 # Additional locations of static files
 STATICFILES_DIRS = [absolute_path('custom', 'static'), ] + STATICFILES_DIRS
@@ -93,8 +94,9 @@ STATICFILES_DIRS = [absolute_path('custom', 'static'), ] + STATICFILES_DIRS
 TEMPLATES[0]['DIRS'] = [absolute_path('custom', 'templates')] + TEMPLATES[0]['DIRS']
 
 # Wagtail Settings
-WAGTAIL_SITE_NAME = 'My Example Site'
-WAGTAILMENUS_SITE_SPECIFIC_TEMPLATE_DIRS = True
+WAGTAIL_SITE_NAME = os.getenv('WAGTAIL_SITE_NAME', 'My Example Site')
+WAGTAILMENUS_SITE_SPECIFIC_TEMPLATE_DIRS = ast.literal_eval(
+    os.getenv('WAGTAILMENUS_SITE_SPECIFIC_TEMPLATE_DIRS', 'True'))
 # -- END Settings for Wagtail
 
 ROOT_URLCONF = 'core.urls'
@@ -105,3 +107,12 @@ LOCALE_PATHS += (
 GEP_TITLE = os.getenv('GEP_TITLE', 'Global Electrification Programme')
 GEP_SHORT_TITLE = os.getenv('GEP_SHORT_TITLE', 'BEP')
 SDI_TITLE = os.getenv('SDI_TITLE', 'Global Electrification Platform SDI')
+GEP_MENU_ENABLED = ast.literal_eval(os.getenv('GEP_MENU_ENABLED', 'True'))
+
+
+CSRF_COOKIE_HTTPONLY = False
+RESOURCE_PUBLISHING = False
+FREETEXT_KEYWORDS_READONLY = True
+
+UPLOADER['SUPPORTED_CRS'].append('ESRI:54030')
+EPSG_CODE_MATCHES['ESRI:54030'] = '(54030) World_Robinson'
