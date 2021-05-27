@@ -5,6 +5,9 @@ MAINTAINER Irwan Fathurrahman<irwan@kartoza.com>
 
 RUN mkdir -p /usr/share/man/man1
 RUN apt-get update -y && apt-get -y --allow-downgrades --allow-remove-essential --allow-unauthenticated install yui-compressor rpl mdbtools git
+RUN echo "Activate memcached" && \
+    apt-get update && apt-get install -y memcached && \
+    pip install pylibmc  && pip install sherlock
 
 WORKDIR /spcgeonode
 
