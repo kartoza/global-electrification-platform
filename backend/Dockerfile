@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 MAINTAINER Irwan Fathurrahman<irwan@kartoza.com>
 
 # Pandoc needed to generate rst dumps, uic compressor needed for django-pipeline
@@ -10,9 +10,6 @@ RUN pip3 install --upgrade pip && pip install --upgrade pip
 
 # setup node
 RUN apt-get install nodejs -y
-RUN apt-get install libssl1.0-dev -y
-RUN apt-get install nodejs-dev -y
-RUN apt-get install node-gyp -y
 RUN apt-get install npm -y
 RUN ln -s /usr/bin/python3 /usr/local/bin/python
 
