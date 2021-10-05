@@ -320,11 +320,6 @@
                             <a href="{% url "maps_browse" %}?limit={{ CLIENT_RESULTS_LIMIT }}">{% trans "Map Viewers" %}</a>
                         {% endif %}
                     </li>
-                    {% if GEP_MENU_ENABLED %}
-                        <li>
-                            <a href="/gep" title="{{ GEP_TITLE }}">{{ GEP_SHORT_TITLE }}</a>
-                        </li>
-                    {% endif %}
                     {% if user.is_authenticated %}
                         <li>
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "About" %}<i class="fa fa-angle-down fa-lg"></i></a>
@@ -344,6 +339,11 @@
                                     <li><a href="{% url "group_create" %}">{% trans "Create Group" %}</a></li>
                                 {% endif %}
                             </ul>
+                        </li>
+                    {% endif %}
+                    {% if GEP_MENU_ENABLED %}
+                        <li>
+                            <a href="/gep" title="{{ GEP_TITLE }}">{{ GEP_SHORT_TITLE }}</a>
                         </li>
                     {% endif %}
                     {% main_menu %}

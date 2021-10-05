@@ -71,15 +71,15 @@
         <div class="row">
             {% for map in maps %}
                 <div class="col-lg-4 map-item">
-                    <a class="map-item-wrappper" href="{% url 'map_view_slug' slug=map.slug %}" data-toggle="tooltip" data-placement="left" title="{{ map.map.title }}">
+                    <div class="map-item-wrappper" onclick="window.location='{% url 'map_view_slug' slug=map.slug %}'" data-toggle="tooltip" data-placement="left" title="{{ map.map.title }}">
                         <div class="viewer-thumb">
                             <img src="{{ map.map.thumbnail_url }}"/>
                         </div>
                         <div class="viewer-desc">
-                            <div class="viewer-title"><strong>{{ map.map.title|truncatechars:40 }}</strong></div>
-                            <div class="map-abstract">{{ map.map.abstract|truncatechars:110 }}</div>
+                            <div class="viewer-title"><strong>{{ map.map.title }}</strong></div>
+                            <div class="map-abstract">{{ map.map.abstract|safe}}</div>
                         </div>
-                    </a>
+                    </div>
                 </div>
             {% endfor %}
         </div>

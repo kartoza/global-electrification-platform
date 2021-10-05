@@ -8,7 +8,7 @@ DATABASES = {
         'HOST': 'postgres',
         'PORT': 5432,
         'CONN_MAX_AGE': 5,
-        'ENGINE': 'django.contrib.gis.db.backends.postgres'},
+        'ENGINE': 'django.contrib.gis.db.backends.postgis'},
     'datastore': {
         'NAME': 'geonode_data',
         'USER': 'geonode_data',
