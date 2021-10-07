@@ -10,6 +10,10 @@ class HomeView(ListView):
     template_name = 'landing_page.html'
     context_object_name = 'maps'
 
+    def get_queryset(self):
+        queryset = MapSlugMapping.objects.filter(featured=True)
+        return queryset
+
 
 def map_view_with_slug(request, slug):
     try:
