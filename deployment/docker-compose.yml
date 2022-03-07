@@ -48,6 +48,7 @@ x-common-django:
     - MEDIA_URL=/uploaded/
     - GEOSERVER_LOCATION=http://nginx/geoserver/
     - SITEURL=${SITEURL}
+    - GEOSERVER_PUBLIC_LOCATION=${SITEURL}/geoserver/
     - ASYNC_SIGNALS=False
     - SESSION_EXPIRED_CONTROL_ENABLED=False
     - MONITORING_ENABLED=False
