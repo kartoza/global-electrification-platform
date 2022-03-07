@@ -1,5 +1,5 @@
-# Somaliland Electrification Platform
-Electrification Platform for Somaliland
+# Global Electrification Platform
+Electrification Platform
 
 ## Preparation
 1. `git submodule init`
@@ -17,11 +17,10 @@ To deploy geonode:
 2. and can be opened in http://localhost/
 
 ## To create new project 
-This project setup for Somaliland. You can fork this project and change the configuration for specific country. To do it:
+This project setup for GEP. You can fork this project and change the configuration for specific country. To do it:
 1. Fork this project
 2. Go to deployment/Makefile and change `PROJECT_ID`
-3. Go to deployment/.env
-4. Change `COMPOSE_PROJECT_NAME=gep-somaliland` to `COMPOSE_PROJECT_NAME=gep-country name` without space (change space with dash) 
-5. Open `docker-compose.yml`. On line 49-51, change 3 configurations into the country name 
-6. Go to frontend/app/assets/scripts/config/defaults.js, change `COUNTRY` into the country name
-7. On the `docker-osm-setting`, put `clip.geojson` file with geojson on the country.
+3. Go to deployment/.env 
+4. Open `docker-compose.yml`. On line 49-51, change 3 configurations into the country name 
+5. Go to frontend/app/assets/scripts/config/defaults.js, change `COUNTRY` into the country name
+6. On the `docker-osm-setting`, put `clip.geojson` file with geojson on the country.

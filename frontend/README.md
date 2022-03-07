@@ -1,2 +1,2 @@
-# Somaliland Electrification Platform (Frontend)
-Electrification Backend Frontend for Somaliland
+# Global Electrification Platform (Frontend)
+Electrification Backend Frontend

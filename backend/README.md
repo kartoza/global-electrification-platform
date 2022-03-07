@@ -1,2 +1,2 @@
-# Somaliland Electrification Platform (Backend)
-Electrification Backend Platform for Somaliland
+# Global Electrification Platform (Backend)
+Electrification Backend Platform

@@ -3,7 +3,7 @@ version: '3.4'
 # Common Django template for Geonode, Celery and Celerycam services below
 x-common-django:
   &default-common-django
-  image: gep-somaliland_django:latest
+  image: gep_django:latest
   build:
     context: ../
     dockerfile: deployment/docker/Dockerfile
@@ -53,9 +53,9 @@ x-common-django:
     - MONITORING_ENABLED=False
     - PYTHONPATH=/home/web/django_project:/spcgeonode
     # for gep configuration
-    - GEP_TITLE=${GEP_TITLE:-Somaliland Electrification Programme}
-    - GEP_SHORT_TITLE=${GEP_SHORT_TITLE:-SEP}
-    - SDI_TITLE=${SDI_TITLE:-Somaliland Electrification Platform SDI}
+    - GEP_TITLE=${GEP_TITLE:-Global Electrification Programme}
+    - GEP_SHORT_TITLE=${GEP_SHORT_TITLE:-GEP}
+    - SDI_TITLE=${SDI_TITLE:-Global Electrification Platform SDI}
     - GEP_MENU_ENABLED=${GEP_MENU_ENABLED}
   volumes:
     - ../django_project:/home/web/django_project
