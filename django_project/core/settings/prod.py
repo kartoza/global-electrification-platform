@@ -32,3 +32,6 @@ else:
         default='django.core.mail.backends.console.EmailBackend')
 
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'admin@kartoza.com')
+
+PROXY_ALLOWED_HOSTS.append('maps.kartoza.com')
+PROXY_ALLOWED_HOSTS.append('a.tiles.mapbox.com')
