@@ -22,6 +22,7 @@ services:
       test: "exit 0"
 
   backend:
+    image: kartoza/gep_backend:${GEP_BACKEND_TAG:-2.0.0}
     build: ../backend
     entrypoint: setup.sh
     volumes:
@@ -32,6 +33,7 @@ services:
       - "3000:3000"
 
   frontend:
+    image: kartoza/gep_frontend:${GEP_FRONTEND_TAG:-2.0.0}
     build: ../frontend
     entrypoint: setup.sh
     command: yarn serve

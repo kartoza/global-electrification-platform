@@ -9,7 +9,7 @@ ENV PATH /usr/local/bin:$PATH
 RUN pip3 install --upgrade pip && pip install --upgrade pip
 
 # setup node
-RUN curl -sL https://deb.nodesource.com/setup_10.x -o nodesource_setup.sh
+RUN curl -sL https://deb.nodesource.com/setup_12.x -o nodesource_setup.sh
 RUN bash nodesource_setup.sh
 RUN apt-get install nodejs -y
 RUN ln -s /usr/bin/python3 /usr/local/bin/python
