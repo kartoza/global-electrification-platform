@@ -16,5 +16,7 @@ RUN ln -s /usr/bin/python3 /usr/local/bin/python
 COPY setup.sh /usr/local/bin/
 RUN ln -s /usr/local/bin/setup.sh
 
+COPY data-service /home/data-service
+
 # setup project
 WORKDIR /home/data-service

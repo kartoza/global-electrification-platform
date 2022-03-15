@@ -16,3 +16,5 @@ django_project/celerybeat-schedule
 .env
 docker-compose.override.yml
 worker.state
+production/backend/fixtures/*
+!production/backend/fixtures/keep
