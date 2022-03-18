@@ -18,3 +18,5 @@ docker-compose.override.yml
 worker.state
 production/backend/fixtures/*
 !production/backend/fixtures/keep
+production/frontend/models/*
+!production/frontend/models/keep

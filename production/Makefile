@@ -33,6 +33,7 @@ frontend-up:
 	@echo "up frontend"
 	@echo "------------------------------------------------------------------"
 	@docker-compose up -d frontend
+	@docker cp frontend/models/. gep-frontend:/home/explorer/app/assets/scripts/config/models
 	@docker cp frontend/defaults.js gep-frontend:/home/explorer/app/assets/scripts/config/defaults.js
 	@docker restart gep-frontend
 

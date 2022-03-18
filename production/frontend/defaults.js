@@ -1,7 +1,7 @@
 'use strict';
 
-import * as bj_1 from '../config/models/bj-1';
-import * as so_1 from '../config/models/so-1';
+import * as bf_2 from '../config/models/bf-2';
+import * as ml_2 from '../config/models/ml-2';
 
 const COUNTRY = 'Global'
 export default {
@@ -18,8 +18,8 @@ export default {
   geonodeUrl: '',
   subUrl: '', // please don't use end trailing slash, example: /gep
   modelConfigs: {
-    'bj-1': bj_1['default'],
-    'so-1': so_1['default']
+    'bf-2': bf_2['default'],
+    'ml-2': ml_2['default']
   }
 };
 
