@@ -1,6 +1,7 @@
 version: '3.4'
 volumes:
   gep-database:
+  frontend:
 
 # This is for production
 # TODO:
@@ -38,7 +39,7 @@ services:
     entrypoint: setup.sh
     command: yarn serve
     volumes:
-      - ../frontend/explorer:/home/explorer
+      - frontend:/home/explorer
     ports:
       - "9000:9000"
 
@@ -47,7 +48,7 @@ services:
     container_name: "gep-nginx"
     volumes:
       - ./nginx:/etc/nginx/conf.d
-      - ../frontend/explorer:/home/explorer:ro
+      - frontend:/home/explorer:ro
     ports:
       - "${HTTP_PORT:-80}:8080"
     restart: on-failure:5

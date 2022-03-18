@@ -1,3 +1,4 @@
+PROJECT_ID := 'gep'
 SHELL := /bin/bash
 
 rebuild:
