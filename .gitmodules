@@ -1,6 +1,6 @@
 [submodule "backend/data-service"]
 	path = backend/data-service
-	url = git@github.com:kartoza/global-electrification-platform-data-service.git
+	url = https://github.com/kartoza/global-electrification-platform-data-service.git
 [submodule "frontend/explorer"]
 	path = frontend/explorer
-	url = git@github.com:kartoza/global-electrification-platform-explorer.git
+	url = https://github.com/kartoza/global-electrification-platform-explorer.git
