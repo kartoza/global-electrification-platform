@@ -37,12 +37,13 @@ frontend-up:
 	@docker cp frontend/defaults.js gep-frontend:/home/explorer/app/assets/scripts/config/defaults.js
 	@docker restart gep-frontend
 
-frontend-build:
+frontend-build: frontend-up
 	@echo
 	@echo "------------------------------------------------------------------"
 	@echo "prepare database"
 	@echo "------------------------------------------------------------------"
 	@docker-compose exec frontend yarn build
+	@docker restart gep-nginx
 
 backend-up:
 	@echo

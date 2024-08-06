@@ -1,0 +1,7 @@
+{
+  "cluster": {
+    "sourceName": "cluster",
+    "url": "url"
+  },
+  "externalLayers": []
+}

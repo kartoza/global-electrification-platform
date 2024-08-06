@@ -1,176 +1,130 @@
 version: '3.4'
-
-# Common Django template for Geonode, Celery and Celerycam services below
-x-common-django:
-  &default-common-django
-  image: gep_django:latest
-  build:
-    context: ../
-    dockerfile: deployment/docker/Dockerfile
-  environment:
-    # editable in .env
-    - HTTPS_HOST=${HTTPS_HOST}
-    - HTTPS_PORT=${HTTPS_PORT}
-    - HTTP_HOST=${HTTP_HOST}
-    - HTTP_PORT=${HTTP_PORT}
-    - ADMIN_USERNAME=${ADMIN_USERNAME}
-    - ADMIN_PASSWORD=${ADMIN_PASSWORD}
-    - ADMIN_EMAIL=${ADMIN_EMAIL}
-    - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL}
-    - GEOSERVER_ADMIN_USER=${ADMIN_USERNAME}
-    - GEOSERVER_ADMIN_PASSWORD=${ADMIN_PASSWORD}
-    - REGISTRATION_OPEN=${REGISTRATION_OPEN}
-    - TIME_ZONE=${TIME_ZONE}
-    - ALLOWED_HOSTS=['nginx','127.0.0.1','localhost','$HTTPS_HOST','$HTTP_HOST']
-    - SECRET_KEY=${SECRET_KEY}
-    - LANGUAGE_CODE=${LANGUAGE_CODE}
-    # data
-    ## -- comment to disable postgis ingestion of uploaded shapefiles
-    - DEFAULT_BACKEND_UPLOADER=geonode.importer
-    - DEFAULT_BACKEND_DATASTORE=datastore
-    # database info, ${variables} are read from .env
-    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    - GEONODE_DATABASE=${GEONODE_DATABASE}
-    - GEONODE_DATABASE_PASSWORD=${GEONODE_DATABASE_PASSWORD}
-    - GEONODE_GEODATABASE=${GEONODE_GEODATABASE}
-    - GEONODE_GEODATABASE_PASSWORD=${GEONODE_GEODATABASE_PASSWORD}
-    - DATABASE_URL=postgis://${GEONODE_DATABASE_USER}:${GEONODE_DATABASE_PASSWORD}@postgres:5432/${GEONODE_DATABASE}
-    - GEODATABASE_URL=postgis://${GEONODE_GEODATABASE_USER}:${GEONODE_GEODATABASE_PASSWORD}@postgres:5432/${GEONODE_GEODATABASE}
-    # hardcoded
-    - CELERY_TASK_ALWAYS_EAGER=${CELERY_TASK_ALWAYS_EAGER:-False}
-    - CELERY_TASK_EAGER_PROPAGATES=${CELERY_TASK_EAGER_PROPAGATES:-False}
-    - DEBUG=${DEBUG:-False}
-    - DJANGO_SETTINGS_MODULE=core.settings.prod
-    - BROKER_URL=amqp://rabbitmq:5672
-    - STATIC_ROOT=/home/web/static/
-    - MEDIA_ROOT=/home/web/media/
-    - STATIC_URL=/static/
-    - MEDIA_URL=/uploaded/
-    - GEOSERVER_LOCATION=http://nginx/geoserver/
-    - SITEURL=${SITEURL}
-    - GEOSERVER_PUBLIC_LOCATION=${SITEURL}/geoserver/
-    - ASYNC_SIGNALS=False
-    - SESSION_EXPIRED_CONTROL_ENABLED=False
-    - MONITORING_ENABLED=False
-    - PYTHONPATH=/home/web/django_project:/spcgeonode
-    # for gep configuration
-    - GEP_TITLE=${GEP_TITLE:-Global Electrification Programme}
-    - GEP_SHORT_TITLE=${GEP_SHORT_TITLE:-GEP}
-    - SDI_TITLE=${SDI_TITLE:-Global Electrification Platform SDI}
-    - GEP_MENU_ENABLED=${GEP_MENU_ENABLED}
-  volumes:
-    - ../django_project:/home/web/django_project
-    - ./volumes/static:/home/web/static:rw
-    - ./volumes/media:/home/web/media:rw
-  restart: on-failure
+volumes:
+  gep-database:
+  gep-import-done:
+  gep-import-queue:
+  gep-cache:
 
 services:
-  # Vanilla RabbitMQ service. This is needed by celery
-  rabbitmq:
-    image: rabbitmq:3.7-alpine
-    volumes:
-      - rabbitmq:/var/lib/rabbitmq
-    restart: on-failure
-
-  # postfix with smtp authentication (sasldb) TLS and OpenDKIM support are optional
-  smtp:
-    image: catatnight/postfix
+  gep-db:
+    # About the postgresql version, it should match in the dockerfile of docker-imposm3
+    image: kartoza/postgis:12.0
     environment:
-      maildomain: kartoza.com
-      smtp_user: noreply:docker
-    restart: unless-stopped
-
-  # Our custom django application. It includes Geonode.
-  django:
-    <<: *default-common-django
-    entrypoint: ["/entrypoint.sh"]
-    command: 'uwsgi --ini /uwsgi.conf'
-
-  nginx:
-    image: geonode/spcgeonode:nginx-3.2
-    hostname: nginx
-    build: ./nginx/
-    environment:
-      - HTTPS_HOST=${HTTPS_HOST}
-      - HTTP_HOST=${HTTP_HOST}
-      - HTTPS_PORT=${HTTPS_PORT}
-      - HTTP_PORT=${HTTP_PORT}
-      - LETSENCRYPT_MODE=${LETSENCRYPT_MODE}
-      - RESOLVER=127.0.0.11
+      - POSTGRES_USER=docker
+      - POSTGRES_PASS=docker
+      - POSTGRES_DBNAME=gis
+      # Uncomment to expose the postgis database on the network
+      # - ALLOW_IP_RANGE= 0.0.0.0/0
     volumes:
-      - ./volumes/logs:/var/log/nginx
-      - ./volumes/static:/home/web/static:ro
-      - ./volumes/media:/home/web/media:ro
-      - ../frontend/explorer/dist:/frontend/:ro
-      - certificates:/spcgeonode-certificates/
-    ports:
-      - "${HTTP_PORT}:80"
-      - "${HTTPS_PORT}:443"
-    restart: unless-stopped
-
-  # Geoserver backend
-  geoserver:
-    image: geonode/spcgeonode:geoserver-3.1
+      - gep-database:/var/lib/postgresql/data/
     healthcheck:
-      test: "curl --fail --silent --write-out 'HTTP CODE : %{http_code}\n' --output /dev/null http://127.0.0.1:8080/geoserver/rest/workspaces/geonode.html"
-      interval: 60s
-      timeout: 10s
-      retries: 1
-      start_period: 60s
-    environment:
-      - HTTPS_HOST=${HTTPS_HOST}
-      - HTTPS_PORT=${HTTPS_PORT}
-      - HTTP_HOST=${HTTP_HOST}
-      - HTTP_PORT=${HTTP_PORT}
-      - ADMIN_USERNAME=${ADMIN_USERNAME}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
-      - DATABASE_URL=postgres://${GEONODE_DATABASE_USER}:${GEONODE_DATABASE_PASSWORD}@postgres:5432/${GEONODE_DATABASE}
-      - GEODATABASE_URL=postgis://${GEONODE_GEODATABASE_USER}:${GEONODE_GEODATABASE_PASSWORD}@postgres:5432/${GEONODE_GEODATABASE}
+      test: "exit 0"
+
+  backend:
+    image: kartoza/gep_backend:${GEP_BACKEND_TAG:-2.0.0}
+    build: ../backend
+    entrypoint: setup.sh
     volumes:
-      - geodatadir:/spcgeonode-geodatadir/
-    restart: on-failure
+      - ../backend/data-service:/home/data-service
+    links:
+      - gep-db:db
+    ports:
+      - "3000:3000"
 
-  # PostGIS database.
-  postgres:
-    # use geonode official postgis 10 image
-    image: geonode/postgis:10
-    environment:
-      # database info, ${variables} are read from .env
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - GEONODE_DATABASE=${GEONODE_DATABASE}
-      - GEONODE_DATABASE_PASSWORD=${GEONODE_DATABASE_PASSWORD}
-      - GEONODE_GEODATABASE=${GEONODE_GEODATABASE}
-      - GEONODE_GEODATABASE_PASSWORD=${GEONODE_GEODATABASE_PASSWORD}
-      - DATABASE_URL=postgres://${GEONODE_DATABASE_USER}:${GEONODE_DATABASE_PASSWORD}@postgres:5432/${GEONODE_DATABASE}
-      - GEODATABASE_URL=postgis://${GEONODE_GEODATABASE_USER}:${GEONODE_GEODATABASE_PASSWORD}@postgres:5432/${GEONODE_GEODATABASE}
+  frontend:
+    image: kartoza/gep_frontend:${GEP_FRONTEND_TAG:-2.0.0}
+    build: ../frontend
+    entrypoint: setup.sh
+    command: yarn serve
     volumes:
-      - database:/var/lib/postgresql/data/
-    restart: on-failure
+      - ../frontend/explorer:/home/explorer
+    ports:
+      - "9000:9000"
 
-  # Celery worker that executes celery tasks created by Django.
-  celery:
-    <<: *default-common-django
-    command: 'celery -A geonode.celery_app:app worker -B -E --statedb=worker.state -s celerybeat-schedule --loglevel=DEBUG --concurrency=10 -n worker1@%h'
-
-  # Gets and installs letsencrypt certificates
-  letsencrypt:
-    image: geonode/spcgeonode:letsencrypt-3.1
-    environment:
-      - HTTPS_HOST=${HTTPS_HOST}
-      - HTTP_HOST=${HTTP_HOST}
-      - ADMIN_EMAIL=${ADMIN_EMAIL}
-      - LETSENCRYPT_MODE=${LETSENCRYPT_MODE}
+  downloader:
+    image: kartoza/docker-osm:pbf-downloader
     volumes:
-      - certificates:/spcgeonode-certificates/
-    restart: on-failure
+      # These are sharable to other containers
+      - ../docker-osm-settings:/home/settings
+    environment:
+      # Read the README in docker-osm-pbf
+      - CONTINENT=africa
+      - COUNTRY=Benin
+      - BASE_URL=http://download.geofabrik.de
+      - MAPPING_URL=''
+      - GEOJSON_URL=''
 
-  # django application for development
-  dev:
-    <<: *default-common-django
+  imposm:
+    image: kartoza/docker-osm:imposm-latest
+    volumes:
+      # These are sharable to other containers
+      - ../docker-osm-settings:/home/settings
+      - gep-import-done:/home/gep-import-done
+      - gep-import-queue:/home/gep-import-queue
+      - gep-cache:/home/gep-cache
+    depends_on:
+      - gep-db
+    environment:
+      - POSTGRES_USER=docker
+      - POSTGRES_PASS=docker
+      - POSTGRES_DBNAME=gis
+      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=gep-db
+      # seconds between 2 executions of the script
+      # if 0, then no update will be done, only the first initial import from the PBF
+      - TIME=120
+      # folder for settings (with *.json and *.sql)
+      - SETTINGS=settings
+      # folder for caching
+      - CACHE=gep-cache
+      # folder for diff which has been imported
+      - IMPORT_DONE=gep-import-done
+      # folder for diff which hasn't been imported yet
+      - IMPORT_QUEUE=gep-import-queue
+      # it can be 3857
+      - SRID=4326
+      # see http://imposm.org/docs/imposm3/latest/tutorial.html#optimize
+      - OPTIMIZE=false
+      # see http://imposm.org/docs/imposm3/latest/tutorial.html#deploy-production-tables
+      - DBSCHEMA_PRODUCTION=public
+      # http://imposm.org/docs/imposm3/latest/tutorial.html#deploy-production-tables
+      - DBSCHEMA_IMPORT=import
+      # http://imposm.org/docs/imposm3/latest/tutorial.html#deploy-production-tables
+      - DBSCHEMA_BACKUP=backup
+      # Install some styles if you are using the default mapping. It can be 'yes' or 'no'
+      - QGIS_STYLE=yes
+      # Use clip in the database - To use this you should have run make import_clip to add your clip to the DB
+      - CLIP=yes
+    command: bash -c "while [ ! -f /home/settings/country.pbf ] ; do sleep 1; done && python3 -u /home/importer.py"
 
-volumes:
-  database:
-  geodatadir:
-  certificates:
-  pgdumps:
-  rabbitmq:
+  osmupdate:
+    image: kartoza/docker-osm:osmupdate-latest
+    volumes:
+      # These are sharable to other containers
+      - ../docker-osm-settings:/home/settings
+      - gep-import-done:/home/gep-import-done
+      - gep-import-queue:/home/gep-import-queue
+      - gep-cache:/home/gep-cache
+    depends_on:
+      - gep-db
+    environment:
+      # These are all currently the defaults but listed here for your
+      # convenience if you want to change them
+      # the maximum time range to assemble a cumulated changefile.
+      - MAX_DAYS=100
+      # osmupdate uses a combination of minutely, hourly and daily changefiles. This value can be minute, hour, day or sporadic.
+      - DIFF=sporadic
+      # argument to determine the maximum number of parallely processed changefiles.
+      - MAX_MERGE=7
+      # define level for gzip compression. values between 1 (low compression but fast) and 9 (high compression but slow)
+      - COMPRESSION_LEVEL=1
+      # change the URL to use a custom URL to fetch regional file updates.
+      - BASE_URL=http://planet.openstreetmap.org/replication/
+      # folder for diff which hasn't been imported yet
+      - IMPORT_QUEUE=gep-import-queue
+      # folder for diff which has been imported
+      - IMPORT_DONE=gep-import-done
+      # seconds between 2 executions of the script
+      # if 0, then no update will be done, only the first initial import from the PBF
+      - TIME=120
+    command: bash -c "while [ ! -f /home/settings/country.pbf ] ; do sleep 1; done && python3 -u /home/download.py"

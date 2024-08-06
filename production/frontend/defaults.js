@@ -1,7 +1,6 @@
 'use strict';
 
-import * as bf_2 from '../config/models/bf-2';
-import * as ml_2 from '../config/models/ml-2';
+import * as example from '../config/models/example';
 
 const COUNTRY = 'Global'
 export default {
@@ -15,11 +14,10 @@ export default {
   basemapStyleLink: 'mapbox://styles/derilinx/ck3yqjovg4dpn1crwajrc9ajr',
 
   country: COUNTRY,
-  geonodeUrl: '',
+  geonodeUrl: 'http://127.0.0.1:80',
   subUrl: '', // please don't use end trailing slash, example: /gep
   modelConfigs: {
-    'bf-2': bf_2['default'],
-    'ml-2': ml_2['default']
+    'example': example['default']
   }
 };
 
